@@ -5,7 +5,8 @@ export const author = defineType({
     name: 'author',
     title: 'Author',
     type: 'document',
-    icon: UserIcon as unknown as React.ReactNode,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon: UserIcon as unknown as any,
     fields: [
         defineField({
             name: 'id',
