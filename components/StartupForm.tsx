@@ -9,45 +9,67 @@ import MDEditor from '@uiw/react-md-editor'
 import { formSchema } from '@/lib/validation'
 import { useToast } from '@/hooks/use-toast'
 import { z } from 'zod'
+import { createPitch } from '@/lib/actions'
+import { useRouter } from 'next/navigation'
 
 const StartupForm = () => {
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [pitch, setPitch] = useState('')
     const { toast } = useToast()
-    const handleFormAction = async (prevState: any, formData: FormData) => {
+    const router = useRouter()
+
+    const handleFormAction = async (
+        prevState: Record<string, string> | undefined,
+        formData: FormData
+    ) => {
         try {
             const formValue = {
                 title: formData.get('title') as string,
                 description: formData.get('description') as string,
                 category: formData.get('category') as string,
                 link: formData.get('link') as string,
-                pitch
+                pitch,
             }
 
             await formSchema.parseAsync(formValue)
-            console.log('formvalue',formValue)
+            const result = await createPitch(formData, pitch)
+
+            if (result.status == 'SUCCESS') {
+                toast({
+                    title: 'Success',
+                    description:
+                        'Your startup pitch has been created successfully',
+                })
+
+                router.push(`/startup/${result._id}`)
+            }
+
+            return result
         } catch (error) {
             if (error instanceof z.ZodError) {
-                const fieldErorrs = error.flatten().fieldErrors;
+                const fieldErorrs = error.flatten().fieldErrors
 
-                setErrors(fieldErorrs as unknown as Record<string, string>);
+                setErrors(fieldErorrs as unknown as Record<string, string>)
 
                 toast({
-                    title: "Error",
-                    description: "Please check your inputs and try again",
-                    variant: "destructive",
-                });
+                    title: 'Error',
+                    description: 'Please check your inputs and try again',
+                    variant: 'destructive',
+                })
 
-                return { ...prevState, error: "Validation failed", status: "ERROR" };
+                return {
+                    ...prevState,
+                    error: 'Validation failed',
+                    status: 'ERROR',
+                }
             }
         }
     }
-    const [state, formAction, isPending] = useActionState(handleFormAction, {
+    const [, formAction, isPending] = useActionState(handleFormAction, {
         error: '',
-        status: 'INITIAL'
+        status: 'INITIAL',
     })
 
-    
     return (
         <form action={formAction} className="startup-form">
             <div>
