@@ -1,15 +1,16 @@
-import { Author, Startup } from "@/sanity/tpyes";
-import { EyeIcon } from "lucide-react"
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "./ui/button";
-import { formatDate } from "@/lib/utils";
+import { Author, Startup } from '@/sanity/tpyes'
+import { EyeIcon } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from './ui/button'
+import { cn, formatDate } from '@/lib/utils'
+import { Skeleton } from './ui/skeleton'
 
 export type StartupTypeCard = Omit<Startup, 'author'> & {
     author?: Author
 }
 
-const StartupCard = ({post}: {post: StartupTypeCard}) => {
+const StartupCard = ({ post }: { post: StartupTypeCard }) => {
     const {
         _createdAt,
         views,
@@ -19,7 +20,7 @@ const StartupCard = ({post}: {post: StartupTypeCard}) => {
         _id,
         image,
         description,
-      } = post;
+    } = post
     return (
         <li className="startup-card group">
             <div className="flex-between">
@@ -77,3 +78,13 @@ const StartupCard = ({post}: {post: StartupTypeCard}) => {
 }
 
 export default StartupCard
+
+export const StartupCardSkeleton = () => (
+    <>
+        {[0, 1, 2, 3, 4].map((index: number) => (
+            <li key={cn('skeleton', index)}>
+                <Skeleton className="startup-card_skeleton" />
+            </li>
+        ))}
+    </>
+)
